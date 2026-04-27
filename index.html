@@ -8,38 +8,29 @@
     :root { --bg:#070707; --pink:#ff1493; --cyan:#00e5ff; --violet:#b26cff; --orange:#ff9f43; --gold:#ffd54a; --green:#00ff88; }
     body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; padding: 20px; }
     .box { background: #1a1a1a; padding: 30px; border-radius: 30px; border: 1px solid rgba(255,255,255,.1); max-width: 500px; margin: 20px auto; }
-    h1 { background: linear-gradient(90deg, var(--pink), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; }
     input, select { width: 90%; padding: 15px; margin: 10px 0; border-radius: 15px; border: none; background: #333; color: white; }
     button { padding: 20px 40px; background: var(--green); border: none; border-radius: 50px; font-weight: 900; font-size: 1.2rem; cursor: pointer; box-shadow: 0 0 20px rgba(0,255,136,.4); }
     .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 20px; }
-    .panel { padding: 15px; border-radius: 20px; border: 2px solid; font-weight: 900; }
+    .panel { padding: 15px; border-radius: 20px; border: 3px solid; font-weight: 900; transition: opacity 0.5s; }
+    .hidden-panel { opacity: 0.2; }
   </style>
 </head>
 <body>
 
 <div class="box" id="setup">
   <h1>Jeu Positions</h1>
-  <select id="playerCount">
-    <option value="2">2 joueurs</option>
-    <option value="3">3 joueurs</option>
-    <option value="4">4 joueurs</option>
-  </select>
-  <input type="text" id="p1" placeholder="Joueur 1">
-  <input type="text" id="p2" placeholder="Joueur 2">
-  <input type="text" id="p3" placeholder="Joueur 3">
-  <input type="text" id="p4" placeholder="Joueur 4">
   <button onclick="lancerJeu()">COMMENCER</button>
 </div>
 
 <div id="game" style="display:none;">
   <h1>🔥 EN JEU 🔥</h1>
-  <button onclick="tournerCadrans()">LANCER LES CADRANS</button>
+  <button id="spinBtn" onclick="tournerCadrans()">LANCER LES 5 CADRANS</button>
   <div class="panels">
-    <div class="panel" style="border-color:var(--pink)">👅<br><span id="c1">00</span></div>
-    <div class="panel" style="border-color:var(--cyan)">❌<br><span id="c2">00</span></div>
-    <div class="panel" style="border-color:var(--violet)">👥<br><span id="c3">00</span></div>
-    <div class="panel" style="border-color:var(--orange)">🎲<br><span id="c4">00</span></div>
-    <div class="panel" style="border-color:var(--gold)">🧪<br><span id="c5">00</span></div>
+    <div class="panel" id="p1" style="border-color:var(--pink)">👅<br><span id="c1">00</span></div>
+    <div class="panel" id="p2" style="border-color:var(--cyan)">❌<br><span id="c2">00</span></div>
+    <div class="panel" id="p3" style="border-color:var(--violet)">👥<br><span id="c3">00</span></div>
+    <div class="panel" id="p4" style="border-color:var(--orange)">🎲<br><span id="c4">00</span></div>
+    <div class="panel" id="p5" style="border-color:var(--gold)">🧪<br><span id="c5">00</span></div>
   </div>
 </div>
 
@@ -49,12 +40,30 @@ function lancerJeu() {
   document.getElementById('game').style.display = 'block';
 }
 
-function tournerCadrans() {
-  document.getElementById('c1').innerText = Math.floor(Math.random()*16);
-  document.getElementById('c2').innerText = Math.floor(Math.random()*80);
-  document.getElementById('c3').innerText = Math.floor(Math.random()*23);
-  document.getElementById('c4').innerText = Math.floor(Math.random()*46);
-  document.getElementById('c5').innerText = Math.floor(Math.random()*5);
+async function tournerCadrans() {
+  document.getElementById('spinBtn').disabled = true;
+  let panels = [1, 2, 3, 4, 5];
+  
+  // Animation de défilement
+  for(let i=0; i<20; i++) {
+    panels.forEach(p => document.getElementById('c'+p).innerText = Math.floor(Math.random()*50));
+    await new Promise(r => setTimeout(r, 100));
+  }
+
+  // Éteindre progressivement
+  let winner = panels[Math.floor(Math.random()*panels.length)];
+  panels.forEach(p => {
+    if(p !== winner) document.getElementById('p'+p).classList.add('hidden-panel');
+  });
+
+  alert("Catégorie gagnante : " + winner + " | Numéro : " + document.getElementById('c'+winner).innerText);
+  
+  if(confirm("Ouvrir le lien de la catégorie ?")) {
+    window.open("https://gaysexpositions.guide/", "_blank");
+  }
+  
+  // Reset
+  setTimeout(() => location.reload(), 1000);
 }
 </script>
 </body>
