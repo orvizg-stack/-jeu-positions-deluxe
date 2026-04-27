@@ -2,23 +2,28 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jeu Positions Deluxe</title>
   <style>
     :root { --bg:#070707; --green:#00ff88; }
     body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-    .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 30px; }
-    .panel { padding: 30px 15px; border: 4px solid; border-radius: 25px; font-weight: 900; transition: all 0.3s ease; opacity: 1; }
+    .box { background: #1a1a1a; padding: 30px; border-radius: 30px; border: 1px solid rgba(255,255,255,.1); max-width: 500px; margin: 20px auto; }
+    input { display: block; width: 90%; padding: 15px; margin: 10px auto; border-radius: 10px; border: none; background: #333; color: white; }
+    button { padding: 20px 40px; background: var(--green); border-radius: 50px; font-weight: 900; cursor: pointer; border: none; margin: 10px; }
+    .panels { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 30px; }
+    .panel { padding: 20px; border: 4px solid; border-radius: 20px; font-weight: 900; transition: all 0.3s; }
     .dimmed { opacity: 0.1; }
     .glitter { border-color: gold !important; transform: scale(1.05); }
-    button { padding: 20px 40px; background: var(--green); border-radius: 50px; font-weight: 900; cursor: pointer; border: none; }
   </style>
 </head>
 <body>
 
-<div id="setup">
+<div class="box" id="setup">
   <h1>Jeu Positions</h1>
-  <input type="text" id="p1" placeholder="J1"> <input type="text" id="p2" placeholder="J2">
-  <input type="text" id="p3" placeholder="J3"> <input type="text" id="p4" placeholder="J4">
+  <input type="text" id="p1" placeholder="Joueur 1">
+  <input type="text" id="p2" placeholder="Joueur 2">
+  <input type="text" id="p3" placeholder="Joueur 3">
+  <input type="text" id="p4" placeholder="Joueur 4">
   <button onclick="lancerJeu()">COMMENCER</button>
 </div>
 
@@ -35,36 +40,48 @@
 </div>
 
 <script>
-let winRes = {name: "69", url: "https://gaysexpositions.guide/69/"};
-let active = [1, 2, 4];
+let winRes = null;
+let winData = null;
 
 function lancerJeu() {
-  if(document.getElementById('p3').value || document.getElementById('p4').value) active.push(3);
   document.getElementById('setup').style.display = 'none';
   document.getElementById('game').style.display = 'block';
 }
 
 async function tourner() {
   document.getElementById('spinBtn').disabled = true;
-  let wIdNum = active[Math.floor(Math.random()*active.length)];
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('dimmed', 'glitter'));
   
-  for(let i=0; i<15; i++) {
+  let p3 = document.getElementById('p3').value.trim();
+  let active = p3 ? [1,2,3,4] : [1,2,4];
+  let wIdNum = active[Math.floor(Math.random()*active.length)];
+  let wNum = "01";
+  winData = { cat: document.getElementById('pan'+wIdNum).innerText.split('\n')[0], num: wNum, url: "https://gaysexpositions.guide/69/" };
+  
+  for(let i=0; i<10; i++) {
     active.forEach(j => document.getElementById('c'+j).innerText = Math.floor(Math.random()*9));
     await new Promise(r => setTimeout(r, 100));
   }
   
-  for(let j of active) {
-    if(j !== wIdNum) document.getElementById('pan'+j).classList.add('dimmed');
-    else document.getElementById('pan'+j).classList.add('glitter');
-    await new Promise(r => setTimeout(r, 400));
-  }
+  document.querySelectorAll('.panel').forEach(p => { 
+    if(p.id !== 'pan'+wIdNum && p.id !== 'pan5') p.classList.add('dimmed'); 
+    else if(p.id !== 'pan5') p.classList.add('glitter'); 
+  });
+  document.getElementById('c'+wIdNum).innerText = wNum;
   document.getElementById('potionBtn').style.display = 'inline-block';
 }
 
 function tirerPotion() {
-  document.getElementById('c5').innerText = Math.random() > 0.5 ? "AVEC" : "SANS";
+  let potion = Math.random() > 0.5 ? "AVEC" : "SANS";
+  document.getElementById('c5').innerText = potion;
   document.getElementById('pan5').classList.add('glitter');
-  if(confirm("Gagné : " + winRes.name + ". Ouvrir le lien ?")) window.open(winRes.url, "_blank");
+  
+  setTimeout(() => {
+    if(confirm(`RÉSUMÉ:\nCatégorie: ${winData.cat}\nNuméro: ${winData.num}\nPotion: ${potion}\n\nOuvrir la position ?`)) {
+      window.open(winData.url, "_blank");
+    }
+    setTimeout(() => location.reload(), 1000);
+  }, 500);
 }
 </script>
 </body>
