@@ -2,68 +2,75 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jeu Positions Deluxe</title>
   <style>
-    :root { --bg:#070707; --pink:#ff1493; --cyan:#00e5ff; --violet:#b26cff; --orange:#ff9f43; --gold:#ffd54a; --green:#00ff88; }
+    :root { --bg:#070707; --green:#00ff88; }
     body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; padding: 20px; }
     .box { background: #1a1a1a; padding: 30px; border-radius: 30px; border: 1px solid rgba(255,255,255,.1); max-width: 500px; margin: 20px auto; }
-    input, select { width: 90%; padding: 15px; margin: 10px 0; border-radius: 15px; border: none; background: #333; color: white; }
-    button { padding: 20px 40px; background: var(--green); border: none; border-radius: 50px; font-weight: 900; font-size: 1.2rem; cursor: pointer; box-shadow: 0 0 20px rgba(0,255,136,.4); }
-    .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 20px; }
-    .panel { padding: 15px; border-radius: 20px; border: 3px solid; font-weight: 900; transition: opacity 0.5s; }
-    .hidden-panel { opacity: 0.2; }
+    button { padding: 20px; background: var(--green); border: none; border-radius: 50px; font-weight: 900; cursor: pointer; }
+    .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 20px; }
+    .panel { padding: 15px; border: 3px solid; border-radius: 15px; font-weight: 900; transition: all 0.5s ease; }
+    .dimmed { opacity: 0.1; }
+    .glitter { animation: glitter 0.3s infinite alternate; }
+    @keyframes glitter { from { border-color: white; transform: scale(1); } to { border-color: gold; transform: scale(1.05); } }
   </style>
 </head>
 <body>
-
 <div class="box" id="setup">
   <h1>Jeu Positions</h1>
   <button onclick="lancerJeu()">COMMENCER</button>
 </div>
-
 <div id="game" style="display:none;">
-  <h1>🔥 EN JEU 🔥</h1>
-  <button id="spinBtn" onclick="tournerCadrans()">LANCER LES 5 CADRANS</button>
+  <button id="spinBtn" onclick="tourner()">LANCER</button>
   <div class="panels">
-    <div class="panel" id="p1" style="border-color:var(--pink)">👅<br><span id="c1">00</span></div>
-    <div class="panel" id="p2" style="border-color:var(--cyan)">❌<br><span id="c2">00</span></div>
-    <div class="panel" id="p3" style="border-color:var(--violet)">👥<br><span id="c3">00</span></div>
-    <div class="panel" id="p4" style="border-color:var(--orange)">🎲<br><span id="c4">00</span></div>
-    <div class="panel" id="p5" style="border-color:var(--gold)">🧪<br><span id="c5">00</span></div>
+    <div class="panel" id="p1" style="border-color:#ff1493">👅<br><span id="c1">00</span></div>
+    <div class="panel" id="p2" style="border-color:#00e5ff">❌<br><span id="c2">00</span></div>
+    <div class="panel" id="p3" style="border-color:#b26cff">👥<br><span id="c3">00</span></div>
+    <div class="panel" id="p4" style="border-color:#ff9f43">🎲<br><span id="c4">00</span></div>
+    <div class="panel" id="p5" style="border-color:#ffd54a">🧪<br><span id="c5">00</span></div>
   </div>
 </div>
 
 <script>
+const db = {
+  "p1": { "01": {name:"69", url:"https://gaysexpositions.guide/69/"}, "02": {name:"69 Kneeling", url:"https://gaysexpositions.guide/kneeling-69/"} },
+  "p2": { "01": {name:"Afternoon Delight", url:"https://gaysexpositions.guide/afternoon-delight/"}, "02": {name:"Arch", url:"https://gaysexpositions.guide/arch/"} },
+  "p3": { "01": {name:"369", url:"https://gaysexpositions.guide/fr/369/"}, "02": {name:"469", url:"https://gaysexpositions.guide/fr/469/"} },
+  "p4": { "01": {name:"Massage du cul", url:"https://gaysexpositions.guide/"}, "02": {name:"Creampie", url:"https://gaysexpositions.guide/"} },
+  "p5": { "01": {name:"Potion", url:"https://gaysexpositions.guide/"} }
+};
+
 function lancerJeu() {
   document.getElementById('setup').style.display = 'none';
   document.getElementById('game').style.display = 'block';
 }
 
-async function tournerCadrans() {
+async function tourner() {
   document.getElementById('spinBtn').disabled = true;
-  let panels = [1, 2, 3, 4, 5];
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('dimmed', 'glitter'));
+  
+  let winnerId = "p" + (Math.floor(Math.random()*5) + 1);
+  let winnerNum = "0" + (Math.floor(Math.random()*2) + 1);
   
   // Animation de défilement
-  for(let i=0; i<20; i++) {
-    panels.forEach(p => document.getElementById('c'+p).innerText = Math.floor(Math.random()*50));
-    await new Promise(r => setTimeout(r, 100));
+  for(let i=0; i<15; i++) {
+    for(let j=1; j<=5; j++) document.getElementById('c'+j).innerText = Math.floor(Math.random()*10);
+    await new Promise(r => setTimeout(r, 80));
   }
-
-  // Éteindre progressivement
-  let winner = panels[Math.floor(Math.random()*panels.length)];
-  panels.forEach(p => {
-    if(p !== winner) document.getElementById('p'+p).classList.add('hidden-panel');
+  
+  // Éteindre les perdants et scintiller le gagnant
+  document.querySelectorAll('.panel').forEach(p => {
+    if(p.id !== winnerId) p.classList.add('dimmed');
+    else p.classList.add('glitter');
   });
-
-  alert("Catégorie gagnante : " + winner + " | Numéro : " + document.getElementById('c'+winner).innerText);
   
-  if(confirm("Ouvrir le lien de la catégorie ?")) {
-    window.open("https://gaysexpositions.guide/", "_blank");
-  }
+  document.getElementById('c'+winnerId.slice(1)).innerText = winnerNum;
   
-  // Reset
-  setTimeout(() => location.reload(), 1000);
+  setTimeout(() => {
+    let res = db[winnerId][winnerNum];
+    if(confirm("Gagné : " + res.name + ". Ouvrir le lien ?")) window.open(res.url, "_blank");
+    document.getElementById('spinBtn').disabled = false;
+  }, 500);
 }
 </script>
 </body>
