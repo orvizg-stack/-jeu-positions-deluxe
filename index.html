@@ -2,75 +2,83 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Jeu Positions Deluxe</title>
   <style>
     :root { --bg:#070707; --green:#00ff88; }
     body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; padding: 20px; }
     .box { background: #1a1a1a; padding: 30px; border-radius: 30px; border: 1px solid rgba(255,255,255,.1); max-width: 500px; margin: 20px auto; }
-    button { padding: 20px; background: var(--green); border: none; border-radius: 50px; font-weight: 900; cursor: pointer; }
-    .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 20px; }
-    .panel { padding: 15px; border: 3px solid; border-radius: 15px; font-weight: 900; transition: all 0.5s ease; }
+    
+    /* Boutons et Inputs */
+    button { padding: 25px 50px; background: var(--green); border: none; border-radius: 50px; font-weight: 900; font-size: 1.4rem; cursor: pointer; box-shadow: 0 0 20px rgba(0,255,136,.4); margin: 10px; }
+    input { width: 80%; padding: 20px; margin: 10px 0; border-radius: 15px; border: none; background: #333; color: white; font-size: 1.2rem; }
+
+    /* Grille des cadrans agrandie */
+    .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
+    .panel { padding: 30px 15px; border: 4px solid; border-radius: 25px; font-weight: 900; font-size: 1.5rem; transition: all 0.5s ease; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .panel span { font-size: 3rem; margin-top: 10px; display: block; }
+    .panel label { font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+
     .dimmed { opacity: 0.1; }
     .glitter { animation: glitter 0.3s infinite alternate; }
     @keyframes glitter { from { border-color: white; transform: scale(1); } to { border-color: gold; transform: scale(1.05); } }
   </style>
 </head>
 <body>
+
 <div class="box" id="setup">
   <h1>Jeu Positions</h1>
+  <input type="text" id="p1" placeholder="Joueur 1">
+  <input type="text" id="p2" placeholder="Joueur 2">
   <button onclick="lancerJeu()">COMMENCER</button>
 </div>
+
 <div id="game" style="display:none;">
-  <button id="spinBtn" onclick="tourner()">LANCER</button>
+  <h1>🔥 EN JEU 🔥</h1>
+  <button id="spinBtn" onclick="tourner()">1. LANCER POSITION</button>
+  
   <div class="panels">
-    <div class="panel" id="p1" style="border-color:#ff1493">👅<br><span id="c1">00</span></div>
-    <div class="panel" id="p2" style="border-color:#00e5ff">❌<br><span id="c2">00</span></div>
-    <div class="panel" id="p3" style="border-color:#b26cff">👥<br><span id="c3">00</span></div>
-    <div class="panel" id="p4" style="border-color:#ff9f43">🎲<br><span id="c4">00</span></div>
-    <div class="panel" id="p5" style="border-color:#ffd54a">🧪<br><span id="c5">00</span></div>
+    <div class="panel" id="p1" style="border-color:#ff1493">abel>BOUCHE</label>👅<span id="c1">00</span></div>
+    <div class="panel" id="p2" style="border-color:#00e5ff">abel>SANS BOUCHE</label>❌<span id="c2">00</span></div>
+    <div class="panel" id="p3" style="border-color:#b26cff">abel>GROUPE</label>👥<span id="c3">00</span></div>
+    <div class="panel" id="p4" style="border-color:#ff9f43">abel>DIVERS</label>🎲<span id="c4">00</span></div>
+  </div>
+  
+  <div style="margin-top:30px;">
+    <button id="potionBtn" style="background:#ffd54a; display:none;" onclick="tirerPotion()">2. LANCER POTION</button>
+    <div class="panel" id="p5" style="border-color:#ffd54a; width:220px; margin:20px auto;">abel>POTION</label>🧪<span id="c5">?</span></div>
   </div>
 </div>
 
 <script>
 const db = {
-  "p1": { "01": {name:"69", url:"https://gaysexpositions.guide/69/"}, "02": {name:"69 Kneeling", url:"https://gaysexpositions.guide/kneeling-69/"} },
-  "p2": { "01": {name:"Afternoon Delight", url:"https://gaysexpositions.guide/afternoon-delight/"}, "02": {name:"Arch", url:"https://gaysexpositions.guide/arch/"} },
-  "p3": { "01": {name:"369", url:"https://gaysexpositions.guide/fr/369/"}, "02": {name:"469", url:"https://gaysexpositions.guide/fr/469/"} },
-  "p4": { "01": {name:"Massage du cul", url:"https://gaysexpositions.guide/"}, "02": {name:"Creampie", url:"https://gaysexpositions.guide/"} },
-  "p5": { "01": {name:"Potion", url:"https://gaysexpositions.guide/"} }
+  "p1": { "01": {name:"69", url:"https://gaysexpositions.guide/69/"} },
+  "p2": { "01": {name:"Afternoon Delight", url:"https://gaysexpositions.guide/afternoon-delight/"} },
+  "p3": { "01": {name:"369", url:"https://gaysexpositions.guide/fr/369/"} },
+  "p4": { "01": {name:"Massage du cul", url:"https://gaysexpositions.guide/"} }
 };
 
-function lancerJeu() {
-  document.getElementById('setup').style.display = 'none';
-  document.getElementById('game').style.display = 'block';
-}
+function lancerJeu() { document.getElementById('setup').style.display = 'none'; document.getElementById('game').style.display = 'block'; }
 
 async function tourner() {
   document.getElementById('spinBtn').disabled = true;
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('dimmed', 'glitter'));
   
-  let winnerId = "p" + (Math.floor(Math.random()*5) + 1);
-  let winnerNum = "0" + (Math.floor(Math.random()*2) + 1);
-  
-  // Animation de défilement
+  let wId = "p" + (Math.floor(Math.random()*4) + 1);
   for(let i=0; i<15; i++) {
-    for(let j=1; j<=5; j++) document.getElementById('c'+j).innerText = Math.floor(Math.random()*10);
+    for(let j=1; j<=4; j++) document.getElementById('c'+j).innerText = Math.floor(Math.random()*9);
     await new Promise(r => setTimeout(r, 80));
   }
   
-  // Éteindre les perdants et scintiller le gagnant
-  document.querySelectorAll('.panel').forEach(p => {
-    if(p.id !== winnerId) p.classList.add('dimmed');
-    else p.classList.add('glitter');
-  });
-  
-  document.getElementById('c'+winnerId.slice(1)).innerText = winnerNum;
-  
-  setTimeout(() => {
-    let res = db[winnerId][winnerNum];
-    if(confirm("Gagné : " + res.name + ". Ouvrir le lien ?")) window.open(res.url, "_blank");
-    document.getElementById('spinBtn').disabled = false;
-  }, 500);
+  document.querySelectorAll('.panel').forEach(p => { if(p.id !== wId && p.id !== 'p5') p.classList.add('dimmed'); else if(p.id !== 'p5') p.classList.add('glitter'); });
+  document.getElementById('c'+wId.slice(1)).innerText = "01";
+  document.getElementById('potionBtn').style.display = 'inline-block';
+}
+
+function tirerPotion() {
+  document.getElementById('c5').innerText = Math.random() > 0.5 ? "AVEC" : "SANS";
+  document.getElementById('p5').classList.add('glitter');
+  setTimeout(() => location.reload(), 3000);
 }
 </script>
 </body>
