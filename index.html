@@ -43,6 +43,12 @@
 
 <script>
 let players = [], idx = 0, winRes = null, active = [1, 2, 4];
+const db = {
+  1: { "01": {name:"69", url:"https://gaysexpositions.guide/69/"}, "02": {name:"69 Kneeling", url:"https://gaysexpositions.guide/kneeling-69/"} },
+  2: { "01": {name:"Afternoon Delight", url:"https://gaysexpositions.guide/afternoon-delight/"}, "02": {name:"Arch", url:"https://gaysexpositions.guide/arch/"} },
+  3: { "01": {name:"369", url:"https://gaysexpositions.guide/fr/369/"}, "02": {name:"469", url:"https://gaysexpositions.guide/fr/469/"} },
+  4: { "01": {name:"Massage du cul", url:"https://gaysexpositions.guide/"}, "02": {name:"Creampie", url:"https://gaysexpositions.guide/"} }
+};
 
 function lancerJeu() {
   players = [document.getElementById('p1').value, document.getElementById('p2').value, document.getElementById('p3').value, document.getElementById('p4').value].filter(v => v);
@@ -55,7 +61,9 @@ function lancerJeu() {
 async function tourner() {
   document.getElementById('spinBtn').disabled = true;
   let wIdNum = active[Math.floor(Math.random()*active.length)];
-  winRes = {name: "Position", url: "https://gaysexpositions.guide/"};
+  let wNum = "0" + (Math.floor(Math.random()*2) + 1);
+  winRes = db[wIdNum][wNum];
+  
   for(let i=0; i<10; i++) {
     active.forEach(j => document.getElementById('c'+j).innerText = Math.floor(Math.random()*9));
     await new Promise(r => setTimeout(r, 100));
@@ -64,20 +72,18 @@ async function tourner() {
     if(p.id !== 'pan'+wIdNum && p.id !== 'pan5') p.classList.add('dimmed'); 
     else if(p.id !== 'pan5') p.classList.add('glitter'); 
   });
-  document.getElementById('c'+wIdNum).innerText = "01";
+  document.getElementById('c'+wIdNum).innerText = wNum;
   document.getElementById('potionBtn').style.display = 'inline-block';
 }
 
 function tirerPotion() {
   document.getElementById('c5').innerText = Math.random() > 0.5 ? "AVEC" : "SANS";
   document.getElementById('pan5').classList.add('glitter');
-  if(confirm("Résumé: "+winRes.name+" | Potion: "+document.getElementById('c5').innerText+". Ouvrir le site ?")) {
+  if(confirm("Gagné : " + winRes.name + ". Ouvrir le lien ?")) {
     window.open(winRes.url, "_blank");
-    // Le bouton n'apparaît qu'après avoir cliqué sur OK
     idx = (idx + 1) % players.length;
-    let nextName = players[idx];
     let btn = document.getElementById('nextBtn');
-    btn.innerText = "AU SUIVANT : " + nextName;
+    btn.innerText = "AU SUIVANT : " + players[idx];
     btn.style.display = 'inline-block';
   }
 }
