@@ -28,6 +28,7 @@
 </div>
 
 <div id="game" style="display:none;">
+  <h2 id="turnDisplay">Au tour de : Joueur 1</h2>
   <button id="spinBtn" onclick="tourner()">1. LANCER LES CADRANS</button>
   <div class="panels">
     <div class="panel" id="pan1" style="border-color:#ff1493">👅 BOUCHE<br><span id="c1">00</span></div>
@@ -37,51 +38,56 @@
   </div>
   <button id="potionBtn" style="display:none; background:#ffd54a;" onclick="tirerPotion()">2. LANCER POTION</button>
   <div class="panel" id="pan5" style="border-color:#ffd54a; width:150px; margin:20px auto;">🧪 POTION<br><span id="c5">?</span></div>
+  <button id="nextBtn" style="display:none; background:#00e5ff;" onclick="nouveauTour()"></button>
 </div>
 
 <script>
-let winRes = null;
-let winData = null;
+let players = [], idx = 0, winRes = null, active = [1, 2, 4];
 
 function lancerJeu() {
+  players = [document.getElementById('p1').value, document.getElementById('p2').value, document.getElementById('p3').value, document.getElementById('p4').value].filter(v => v);
+  if (players.length > 2) active.push(3);
   document.getElementById('setup').style.display = 'none';
   document.getElementById('game').style.display = 'block';
+  document.getElementById('turnDisplay').innerText = "Au tour de : " + players[0];
 }
 
 async function tourner() {
   document.getElementById('spinBtn').disabled = true;
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('dimmed', 'glitter'));
-  
-  let p3 = document.getElementById('p3').value.trim();
-  let active = p3 ? [1,2,3,4] : [1,2,4];
   let wIdNum = active[Math.floor(Math.random()*active.length)];
-  let wNum = "01";
-  winData = { cat: document.getElementById('pan'+wIdNum).innerText.split('\n')[0], num: wNum, url: "https://gaysexpositions.guide/69/" };
-  
+  winRes = {name: "Position", url: "https://gaysexpositions.guide/"};
   for(let i=0; i<10; i++) {
     active.forEach(j => document.getElementById('c'+j).innerText = Math.floor(Math.random()*9));
     await new Promise(r => setTimeout(r, 100));
   }
-  
   document.querySelectorAll('.panel').forEach(p => { 
     if(p.id !== 'pan'+wIdNum && p.id !== 'pan5') p.classList.add('dimmed'); 
     else if(p.id !== 'pan5') p.classList.add('glitter'); 
   });
-  document.getElementById('c'+wIdNum).innerText = wNum;
+  document.getElementById('c'+wIdNum).innerText = "01";
   document.getElementById('potionBtn').style.display = 'inline-block';
 }
 
 function tirerPotion() {
-  let potion = Math.random() > 0.5 ? "AVEC" : "SANS";
-  document.getElementById('c5').innerText = potion;
+  document.getElementById('c5').innerText = Math.random() > 0.5 ? "AVEC" : "SANS";
   document.getElementById('pan5').classList.add('glitter');
-  
-  setTimeout(() => {
-    if(confirm(`RÉSUMÉ:\nCatégorie: ${winData.cat}\nNuméro: ${winData.num}\nPotion: ${potion}\n\nOuvrir la position ?`)) {
-      window.open(winData.url, "_blank");
-    }
-    setTimeout(() => location.reload(), 1000);
-  }, 500);
+  if(confirm("Résumé: "+winRes.name+" | Potion: "+document.getElementById('c5').innerText+". Ouvrir le site ?")) {
+    window.open(winRes.url, "_blank");
+    // Le bouton n'apparaît qu'après avoir cliqué sur OK
+    idx = (idx + 1) % players.length;
+    let nextName = players[idx];
+    let btn = document.getElementById('nextBtn');
+    btn.innerText = "AU SUIVANT : " + nextName;
+    btn.style.display = 'inline-block';
+  }
+}
+
+function nouveauTour() {
+  document.getElementById('nextBtn').style.display = 'none';
+  document.getElementById('potionBtn').style.display = 'none';
+  document.getElementById('turnDisplay').innerText = "Au tour de : " + players[idx];
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('dimmed', 'glitter'));
+  document.getElementById('spinBtn').disabled = false;
 }
 </script>
 </body>
