@@ -1,406 +1,51 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Jeu Positions Deluxe 🔥</title>
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#070707;
-      --surface:#141414;
-      --surface-2:#1d1d1d;
-      --text:#f4f4f4;
-      --muted:#aaaaaa;
-      --border:rgba(255,255,255,.10);
-      --pink:#ff1493;
-      --cyan:#00e5ff;
-      --violet:#b26cff;
-      --orange:#ff9f43;
-      --gold:#ffd54a;
-      --green:#00ff88;
-      --radius:24px;
-      --radius-sm:16px;
-    }
-    *{margin:0;padding:0;box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      font-family:'Satoshi',sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(circle at top, rgba(255,20,147,.10), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(0,229,255,.08), transparent 24%),
-        #070707;
-      overflow:hidden;
-    }
-    .setup-popup{
-      position:fixed; inset:0; z-index:3000;
-      display:flex; align-items:center; justify-content:center;
-      background:rgba(0,0,0,.94);
-      padding:16px;
-    }
-    .setup-box{
-      width:min(760px,100%);
-      background:linear-gradient(180deg,#1a1a1a,#101010);
-      border:1px solid var(--border);
-      border-radius:30px;
-      padding:32px 24px;
-      box-shadow:0 24px 60px rgba(0,0,0,.55);
-    }
-    .setup-title{
-      text-align:center;
-      font-weight:900;
-      font-size:clamp(1.8rem,6vw,2.8rem);
-      margin-bottom:10px;
-    }
-    .setup-title span{
-      background:linear-gradient(90deg,var(--pink),var(--cyan));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
-    }
-    .setup-text{
-      text-align:center;
-      color:var(--muted);
-      margin-bottom:24px;
-      font-size:1rem;
-    }
-    .setup-label{
-      display:block;
-      margin-bottom:8px;
-      color:var(--muted);
-      font-weight:700;
-      font-size:.95rem;
-    }
-    .player-count,.setup-player-input{
-      width:100%;
-      border:none;
-      outline:none;
-      background:var(--surface);
-      color:var(--text);
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:16px;
-      font-size:1rem;
-    }
-    .setup-grid{display:grid; gap:18px}
-    .setup-players{display:grid; gap:12px}
-    .hidden{display:none !important}
-    .setup-actions{
-      display:flex; gap:12px; flex-direction:column;
-      margin-top:22px;
-    }
-    .start-btn,.secondary-btn,.spin-btn,.view-btn,.potion-btn,.close-btn{
-      border:none; cursor:pointer; font-family:inherit;
-      padding:16px 20px; border-radius:999px;
-      font-weight:800; font-size:1rem;
-    }
-    .start-btn{
-      background:linear-gradient(90deg,var(--pink),var(--cyan));
-      color:#000;
-    }
-    .secondary-btn,.close-btn{
-      background:transparent; color:var(--text);
-      border:1px solid var(--border);
-    }
-    .setup-error{
-      min-height:22px; margin-top:10px; color:#ff97c9;
-      text-align:center; font-weight:700;
-    }
-
-    .game-shell{
-      height:100vh;
-      display:flex;
-      flex-direction:column;
-      visibility:hidden;
-    }
-    .game-shell.ready{visibility:visible}
-
-    .header{
-      text-align:center;
-      padding:22px 16px 14px;
-      font-size:clamp(1.5rem,4vw,2.2rem);
-      font-weight:900;
-      flex-shrink:0;
-    }
-    .header span{
-      background:linear-gradient(90deg,var(--pink),var(--cyan));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
-    }
-    .current-turn{
-      margin:0 auto 12px;
-      max-width:calc(100% - 24px);
-      background:rgba(255,255,255,.05);
-      border:1px solid var(--border);
-      border-radius:999px;
-      padding:12px 16px;
-      font-size:.95rem;
-      text-align:center;
-      flex-shrink:0;
-    }
-    .players-summary{
-      display:flex;
-      justify-content:center;
-      gap:8px;
-      flex-wrap:wrap;
-      padding:0 14px 14px;
-      flex-shrink:0;
-    }
-    .player-chip{
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.05);
-      border:1px solid var(--border);
-      color:var(--muted);
-      font-size:.9rem;
-    }
-
-    .launch-wrap{
-      padding:0 16px 14px;
-      flex-shrink:0;
-    }
-    .launch-btn{
-      width:100%;
-      border:none;
-      cursor:pointer;
-      border-radius:999px;
-      padding:20px 22px;
-      font-size:clamp(1.2rem,4vw,1.7rem);
-      font-weight:900;
-      color:#000;
-      background:linear-gradient(90deg,var(--green),#8dffbf);
-      box-shadow:0 0 30px rgba(0,255,136,.35);
-      transition:transform .08s ease;
-    }
-    .launch-btn.spinning{
-      animation:launchPulse 0.7s infinite;
-    }
-    @keyframes launchPulse{
-      0%,100%{transform:scale(1);box-shadow:0 0 20px rgba(0,255,136,.35);}
-      50%{transform:scale(1.06);box-shadow:0 0 50px rgba(0,255,136,1);}
-    }
-
-    .panels{
-      flex:1;
-      overflow:auto;
-      padding:16px;
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:16px;
-      align-items:stretch;
-    }
-    .panel{
-      background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:22px 16px;
-      display:flex;
-      flex-direction:column;
-      gap:16px;
-      justify-content:space-between;
-      min-height:230px;
-      transition:transform .05s ease;
-    }
-    .panel.spinning{
-      animation:panelShake 0.12s infinite;
-    }
-    @keyframes panelShake{
-      0%{transform:translateY(0) rotate(0deg);}
-      25%{transform:translateY(-2px) rotate(-0.4deg);}
-      50%{transform:translateY(0) rotate(0.4deg);}
-      75%{transform:translateY(2px) rotate(0deg);}
-      100%{transform:translateY(0) rotate(0deg);}
-    }
-
-    .panel-title{
-      text-align:center;
-      font-size:1rem;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-    }
-    .panel1{border-color:rgba(255,20,147,.35); box-shadow:0 0 26px rgba(255,20,147,.16)}
-    .panel2{border-color:rgba(0,229,255,.35); box-shadow:0 0 26px rgba(0,229,255,.14)}
-    .panel3{border-color:rgba(178,108,255,.35); box-shadow:0 0 26px rgba(178,108,255,.16)}
-    .panel4{border-color:rgba(255,159,67,.35); box-shadow:0 0 26px rgba(255,159,67,.14)}
-    .panel5{border-color:rgba(255,213,74,.35); box-shadow:0 0 26px rgba(255,213,74,.16)}
-
-    .panel1 .panel-title{color:var(--pink)}
-    .panel2 .panel-title{color:var(--cyan)}
-    .panel3 .panel-title{color:var(--violet)}
-    .panel4 .panel-title{color:var(--orange)}
-    .panel5 .panel-title{color:var(--gold)}
-
-    .counter{
-      min-height:88px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      font-size:clamp(2.8rem,9vw,5.5rem);
-      font-weight:900;
-      line-height:1;
-      font-variant-numeric:tabular-nums;
-    }
-    .panel1 .counter{color:var(--pink)}
-    .panel2 .counter{color:var(--cyan)}
-    .panel3 .counter{color:var(--violet)}
-    .panel4 .counter{color:var(--orange)}
-    .panel5 .counter{color:var(--gold)}
-
-    .counter.rolling{animation:roll .08s infinite;}
-
-    .counter.final{animation:flash .35s 4;}
-
-    @keyframes roll{
-      0%,100%{transform:scale(1);}
-      50%{transform:scale(1.06);}
-    }
-    @keyframes flash{
-      0%,100%{opacity:1;transform:scale(1);}
-      50%{opacity:.4;transform:scale(1.12);}
-    }
-
-    .panel1 .spin-btn{background:linear-gradient(90deg,var(--pink),#ff5fc0);color:#000}
-    .panel2 .spin-btn{background:linear-gradient(90deg,var(--cyan),#89f8ff);color:#000}
-    .panel3 .spin-btn{background:linear-gradient(90deg,var(--violet),#d1a9ff);color:#000}
-    .panel4 .spin-btn{background:linear-gradient(90deg,var(--orange),#ffc072);color:#000}
-    .panel5 .spin-btn{background:linear-gradient(90deg,var(--gold),#ffea92);color:#000}
-    .spin-btn:disabled{opacity:.45;cursor:not-allowed}
-    .player-info{
-      min-height:24px;
-      color:var(--muted);
-      text-align:center;
-      font-size:.95rem;
-    }
-
-    .popup{
-      position:fixed; inset:0; z-index:2500;
-      display:none; align-items:center; justify-content:center;
-      background:rgba(0,0,0,.94);
-      padding:16px;
-      transition:opacity .2s;
-    }
-    .popup.active{display:flex}
-
-    .popup-box{
-      width:min(760px,100%);
-      background:linear-gradient(180deg,#1a1a1a,#101010);
-      border:1px solid var(--border);
-      border-radius:30px;
-      padding:32px 24px;
-      box-shadow:0 24px 60px rgba(0,0,0,.55);
-      text-align:center;
-      opacity:0;
-      transform:scale(.85);
-      transition:all .3s ease;
-    }
-    .popup.active .popup-box{
-      opacity:1;
-      transform:scale(1);
-    }
-
-    .popup-num{
-      font-size:clamp(4rem,15vw,8rem);
-      font-weight:900;
-      line-height:1;
-      margin-bottom:12px;
-      text-shadow:0 0 10px currentColor;
-    }
-    .color1 .popup-num{color:var(--pink);text-shadow:0 0 20px var(--pink);}
-    .color2 .popup-num{color:var(--cyan);text-shadow:0 0 20px var(--cyan);}
-    .color3 .popup-num{color:var(--violet);text-shadow:0 0 20px var(--violet);}
-    .color4 .popup-num{color:var(--orange);text-shadow:0 0 20px var(--orange);}
-    .color5 .popup-num{color:var(--gold);text-shadow:0 0 20px var(--gold);}
-
-    .popup-num.flashing{
-      animation:numFlash 0.4s 4 ease-out;
-    }
-    @keyframes numFlash{
-      0%,100%{opacity:1;transform:scale(1);}
-      50%{opacity:0.5;transform:scale(1.1);}
-    }
-
-    .popup-name{
-      font-size:clamp(1.7rem,6vw,2.9rem);
-      font-weight:900;
-      line-height:1.2;
-    }
-
-    .popup-action{
-      margin-top:12px;
-      color:var(--muted);
-      font-size:1rem;
-    }
-
-    .popup2-title{
-      font-size:clamp(1.3rem,5vw,2rem);
-      font-weight:900;
-      margin-bottom:12px;
-    }
-    .popup2-posname{
-      font-size:clamp(1.6rem,6vw,2.5rem);
-      font-weight:900;
-      margin-bottom:18px;
-    }
-    .action-row{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-    .view-btn{
-      background:linear-gradient(90deg,var(--pink),var(--cyan));
-      color:#000;
-    }
-    .potion-btn{
-      background:linear-gradient(90deg,var(--gold),#ffea92);
-      color:#000;
-    }
-
-    .color1{color:var(--pink);text-shadow:0 0 12px var(--pink);}
-    .color2{color:var(--cyan);text-shadow:0 0 12px var(--cyan);}
-    .color3{color:var(--violet);text-shadow:0 0 12px var(--violet);}
-    .color4{color:var(--orange);text-shadow:0 0 12px var(--orange);}
-    .color5{color:var(--gold);text-shadow:0 0 12px var(--gold);}
-
-    @media (min-width:700px){
-      .setup-actions,.action-row{flex-direction:row}
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeu Positions</title>
+<style>
+  body { background: #070707; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+  .setup-box { background: #1a1a1a; padding: 30px; border-radius: 20px; max-width: 500px; margin: auto; }
+  input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 10px; border: none; }
+  button { padding: 15px 30px; background: #00ff88; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; }
+</style>
 </head>
 <body>
+<div id="setupPopup" class="setup-box">
+  <h1>Jeu Positions Deluxe</h1>
+  <select id="playerCount">
+    <option value="2">2 joueurs</option>
+    <option value="3">3 joueurs</option>
+    <option value="4">4 joueurs</option>
+  </select><br>
+  <input type="text" id="setupP1" placeholder="Joueur 1">
+  <input type="text" id="setupP2" placeholder="Joueur 2">
+  <input type="text" id="setupP3" placeholder="Joueur 3 (optionnel)">
+  <input type="text" id="setupP4" placeholder="Joueur 4 (optionnel)"><br>
+  <button onclick="lancerJeu()">Commencer la partie</button>
+</div>
 
-  <div class="setup-popup" id="setupPopup">
-    <div class="setup-box">
-      <div class="setup-title"><span>Jeu Positions Deluxe</span></div>
-      <div class="setup-text">Choisis le nombre de joueurs puis remplis les prénoms avant de commencer.</div>
-      <div class="setup-grid">
-        <div>
-          <label class="setup-label" for="playerCount">Nombre de joueurs</label>
-          <select id="playerCount" class="player-count">
-            <option value="2">2 joueurs</option>
-            <option value="3">3 joueurs</option>
-            <option value="4">4 joueurs</option>
-          </select>
-        </div>
-        <div>
-          <label class="setup-label">Noms des joueurs</label>
-          <div class="setup-players">
-            <input type="text" class="setup-player-input" id="setupP1" placeholder="Joueur 1">
-            <input type="text" class="setup-player-input" id="setupP2" placeholder="Joueur 2">
-            <input type="text" class="setup-player-input" id="setupP3" placeholder="Joueur 3">
-            <input type="text" class="setup-player-input" id="setupP4" placeholder="Joueur 4">
-          </div>
-          <div class="setup-error" id="setupError"></div>
-        </div>
-      </div>
-      <div class="setup-actions">
-        <button class="start-btn" id="startGameBtn">▶ Commencer la partie</button>
-        <button class="secondary-btn" id="fillDemoBtn">Remplir automatiquement</button>
-      </div>
-    </div>
-  </div>
+<div id="gameShell" style="display:none;">
+  <h1>Partie en cours 🔥</h1>
+  <button onclick="location.reload()">Nouvelle partie</button>
+</div>
 
-  <
+<script>
+function lancerJeu() {
+  const count = parseInt(document.getElementById('playerCount').value);
+  const p1 = document.getElementById('setupP1').value.trim();
+  const p2 = document.getElementById('setupP2').value.trim();
+  
+  // Validation corrigée : vérifie juste que les deux premiers sont là
+  if(p1 !== "" && p2 !== "") {
+      document.getElementById('setupPopup').style.display = 'none';
+      document.getElementById('gameShell').style.display = 'block';
+      alert("C'est parti !");
+  } else {
+      alert("Erreur : Remplis au moins le Joueur 1 et le Joueur 2.");
+  }
+}
+</script>
+</body>
+</html>
